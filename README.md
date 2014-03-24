@@ -3,7 +3,7 @@ mpv-autocrop
 autocropping scripts for [mpv](https://github.com/mpv-player/mpv)
 
 
-The main script is mpv-autocrop.py. It uses calls mpv with the lua scripts to search the arguments for valid playlist items and then automatically compute the appropriate --vf=crop command for each one. Finally it calls mpv with the the computed crop commands. Unparsed arguments are passed on to mpv.
+The main script is mpv-autocrop.py. It calls mpv with the lua scripts to search the arguments for valid playlist items and then get a serieds of .pgm grayscale screenshots. From this, it uses numpy to automatically compute the appropriate --vf=crop command for each one. Finally it calls mpv with the the computed crop commands. Unparsed arguments are passed on to mpv.
 
 
 dependencies
@@ -36,3 +36,7 @@ You can get some diagnostic plotting with
 And you can verify that mpv crops exactly as expected
 
     $ mpv_autocrop.py --verify file.mkv
+
+For other options, see
+
+    $ mpv_autocrop.py --help
