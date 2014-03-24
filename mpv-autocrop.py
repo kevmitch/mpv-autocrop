@@ -65,6 +65,7 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
               '--lua-opts=%s.out_file=%s'%(mpv_lua_script_name,tmp_path),
               '--vo=null',
               '--ao=null',
+              '--no-audio',
               '--no-cache']
 
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
@@ -97,15 +98,16 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
     with tmp_dir() as tmp_dir_path:
         cmd=['mpv']+mpv_args
         cmd+=['--no-config',
-               '--no-resume-playback',
-               '--no-cache',
-               '--hwdec=no',
-               '--vo=image:format=pgm:outdir=%s'%tmp_dir_path,
-               '--vf-add=dsize',
-               '--ao=null',
-               '--lua=%s'%(mpv_lua_script),
-               '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots),
-               fname]
+              '--no-resume-playback',
+              '--no-cache',
+              '--hwdec=no',
+              '--vo=image:format=pgm:outdir=%s'%tmp_dir_path,
+              '--vf-add=dsize',
+              '--ao=null',
+              '--no-audio',
+              '--lua=%s'%(mpv_lua_script),
+              '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots),
+              fname]
 
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
         stdout,stderr=p.communicate()
@@ -117,7 +119,6 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
             print 'STDOUT/STDERR was'
             print stdout
             sys.exit(1)
-
 
         fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
         ims=imread(fpaths[0])
