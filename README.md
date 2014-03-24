@@ -24,16 +24,16 @@ Usage
 Optional arguments
 ==================
 
-    -h, --help            
+    -h, --help
 show help message and exit
 
     --nshots NSHOTS, -n NSHOTS
 number of screenshots from which to estimate the crop parameters
 
-    --tol TOL, -t TOL     
-the maximum brightness of pixels discarded by cropping (1.0 is maximum brightness)
+    --tol TOL, -t TOL
+the maximum brightness of pixels discarded by cropping (1.0 is full brightness)
 
-    --pad PAD, -d PAD     
+    --pad PAD, -d PAD
 additional pixels to add to each side of the cropped image
 
     --show-plot, -p

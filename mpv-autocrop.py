@@ -274,7 +274,7 @@ if __name__ == "__main__":
     cmd=sys.argv[0]
     parser = argparse.ArgumentParser(description="This script uses mpv to search its arguments for valid playlist items and automatically computes the appropriate --vf=crop command for each one. These are then amalgamated with any unparsed arguments and used to finally execute mpv.")
     parser.add_argument('--nshots','-n',type=int,default=11,help="number of screenshots from which to estimate the crop parameters")
-    parser.add_argument('--tol','-t',type=float,default=0.05,help="the maximum brightness of pixels discarded by cropping (1.0 is maximum brightness)")
+    parser.add_argument('--tol','-t',type=float,default=0.05,help="the maximum brightness of pixels discarded by cropping (1.0 is full brightness)")
     parser.add_argument('--pad','-d',type=int,default=0,help="additional pixels to add to each side of the cropped image")
     parser.add_argument('--show-plot','-p',action='store_true',help="enable diagnostic plotting/visualisation (requires matplotlib)")
     parser.add_argument('--ignore-pixels','-i',type=int,default=0,help="number of pixels on the outter edge of the image to ignore")
