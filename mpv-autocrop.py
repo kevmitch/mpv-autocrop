@@ -179,7 +179,7 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
         print 'crop_verified!'
 
 
-def get_crop_cmd(fname,nshots=11,tol=0.02,pad=0,ignore_pixels=0,show_plot=False,verify=False):
+def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=False,verify=False):
     """
     compute the appropriate crop command for a given file
     """
@@ -190,10 +190,9 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=0,ignore_pixels=0,show_plot=False,
     ymx=ims.transpose((1,0,2)).reshape((Ny,-1)).max(axis=-1)/imax
     xmx=ims.transpose((2,1,0)).reshape((Nx,-1)).max(axis=-1)/imax
 
-    # determine the cropping region where pixels average to greater than tol
-    ygood=ymx>=tol
-    xgood=xmx>=tol
-    print ymx[:10],tol
+    # determine the cropping region where pixels average to greater than thresh
+    ygood=ymx>=thresh
+    xgood=xmx>=thresh
 
     if ygood.size>0:
         crop_top=np.flatnonzero(ygood[ignore_pixels:]      )[0]
@@ -303,7 +302,7 @@ if __name__ == "__main__":
     cmd=sys.argv[0]
     parser = argparse.ArgumentParser(description="This script uses mpv to search its arguments for valid playlist items and automatically computes the appropriate --vf=crop command for each one. These are then amalgamated with any unparsed arguments and used to finally execute mpv.")
     parser.add_argument('--nshots','-n',type=int,default=11,help="number of screenshots from which to estimate the crop parameters")
-    parser.add_argument('--tol','-t',type=float,default=0.1,help="the maximum brightness of pixels discarded by cropping (1.0 is full brightness)")
+    parser.add_argument('--thresh','-t',type=float,default=0.1,help="the maximum brightness of pixels discarded by cropping (1.0 is full luma)")
     parser.add_argument('--pad','-d',type=int,default=0,help="additional pixels to add to each side of the cropped image")
     parser.add_argument('--show-plot','-p',action='store_true',help="enable diagnostic plotting/visualisation (requires matplotlib)")
     parser.add_argument('--ignore-pixels','-i',type=int,default=0,help="number of pixels on the outter edge of the image to ignore")
