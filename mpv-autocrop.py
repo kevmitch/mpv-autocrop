@@ -75,11 +75,15 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
             print 'COMMAND WAS'
             print cmd
             print 'STDOUT/STDERR was'
-            print stdtout
+            print stdout
             sys.exit(1)
 
         with open(tmp_path,'r') as tmp_object:
-            playlist=tmp_object.read().strip('\0').split('\0')
+            playlist=tmp_object.read().strip('\0')
+            if len(playlist)==0:
+                playlist=[]
+            else:
+                playlist=playlist.split('\0')
     return playlist
 
 default_scan_script=os.path.join(script_dir,'scan.lua')
@@ -111,7 +115,7 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
             print 'COMMAND WAS'
             print cmd
             print 'STDOUT/STDERR was'
-            print stdtout
+            print stdout
             sys.exit(1)
 
         if rc!=0:
@@ -258,6 +262,7 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,
 def main(mpv_args=[],**kwargs):
     # use mpv itself to figure out which arguments are playable items
     playlist_files=get_playlist_files(mpv_args)
+    assert len(playlist_files)>0,"need at least one playable, but file found none"
     # remove those from the args list
     mpv_args=[arg for arg in mpv_args if arg not in playlist_files]
     # add them back with appropriate crop commands
