@@ -118,11 +118,6 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
             print stdout
             sys.exit(1)
 
-        if rc!=0:
-            print 'mpv screenshot command exited with non-zero status'
-            print 'command was'
-            print cmd
-            sys.exit(1)
 
         fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
         ims=imread(fpaths[0])
