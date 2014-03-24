@@ -3,10 +3,8 @@ mpv-autocrop
 autocropping scripts for [mpv](https://github.com/mpv-player/mpv)
 
 
-This script uses mpv to search its arguments for valid playlist items and
-automatically computes the appropriate --vf=crop command for each one. These
-are then amalgamated with any unparsed arguments and used to finally execute
-mpv.
+The main script is mpv-autocrop.py. It uses calls mpv with lua scripts to search the arguments for valid playlist items and then automatically compute the appropriate --vf=crop command for each one. Finally it calls mpv with the the computed crop command. Unparsed arguments are passed on to mpv.
+
 
 dependencies
 ============
