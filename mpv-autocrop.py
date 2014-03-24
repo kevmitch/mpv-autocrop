@@ -206,7 +206,11 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,
     if show_plot:
         """visually check the crop detection"""
         from time import sleep
-        import pylab as pl
+        try:
+            import pylab as pl
+        except ImportError:
+            print import_err_msg%("matplotlib","python-matplotlib")
+            sys.exit(1)
         pl.ion()
 
         fig=pl.figure(1,dpi=150)
