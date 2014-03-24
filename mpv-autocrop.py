@@ -175,9 +175,11 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
                 print 'press enter to continue'
                 raw_input()
         sys.exit(1)
+    else:
+        print 'crop_verified!'
 
 
-def get_crop_cmd(fname,nshots=11,tol=0.02,pad=0,ignore_pixels=0,show_plot=False,verify=True):
+def get_crop_cmd(fname,nshots=11,tol=0.02,pad=0,ignore_pixels=0,show_plot=False,verify=False):
     """
     compute the appropriate crop command for a given file
     """
@@ -305,6 +307,7 @@ if __name__ == "__main__":
     parser.add_argument('--pad','-d',type=int,default=0,help="additional pixels to add to each side of the cropped image")
     parser.add_argument('--show-plot','-p',action='store_true',help="enable diagnostic plotting/visualisation (requires matplotlib)")
     parser.add_argument('--ignore-pixels','-i',type=int,default=0,help="number of pixels on the outter edge of the image to ignore")
+    parser.add_argument('--verify',action="store_true",help="verify that the croping region computed in python is really what mpv will display")
     parser.usage=parser.format_usage().strip()+' [MPV_ARGS]'
     options,mpv_args=parser.parse_known_args(sys.argv[1:])
     options=vars(options)
