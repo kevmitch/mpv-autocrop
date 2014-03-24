@@ -3,12 +3,10 @@ mpv-autocrop
 autocropping scripts for [mpv](https://github.com/mpv-player/mpv)
 
 
-This script uses mpv to search its arguments for valid playlist items and
-automatically computes the appropriate --vf=crop command for each one. These
-are then amalgamated with any unparsed arguments and used to finally execute
-mpv.
+The main script is mpv-autocrop.py. It uses calls mpv with the lua scripts to search the arguments for valid playlist items and then automatically compute the appropriate --vf=crop command for each one. Finally it calls mpv with the the computed crop commands. Unparsed arguments are passed on to mpv.
 
-Dependencies
+
+dependencies
 ============
 In order to run this program you need
 * python-numpy
@@ -17,25 +15,24 @@ In order to run this program you need
 * mpv with lua scripting enabled
 * python-matplotlib (for the --show-plot functionality)
 
-Examples
+examples
 ========
 To play a file with its dark borders cut out, simply run
 
-    $ mpv_autocrop.py file.mkv 
-    
-Adjust the tolerance for what is considered "black" as a fraction between 0 (no luma) and 1 (max luma)
+    $ mpv_autocrop.py file.mkv
 
-    $ mpv_autocrop.py --tol 0.1 file.mkv
-    
+Adjust the treshold for what is considered "black" as a fraction between 0 (no luma) and 1 (max luma)
+
+    $ mpv_autocrop.py --thresh 0.1 file.mkv
+
 Any arguments not recognized by the script are passed on to mpv
 
     $ mpv_autocrop.py file.mkv --start=10:00 --vo=opengl-hq
-    
+
 You can get some diagnostic plotting with
 
-    $ mpv_autocrop.py -p file.mkv
-        
+    $ mpv_autocrop.py --show-plot file.mkv
+
 And you can verify that mpv crops exactly as expected
 
     $ mpv_autocrop.py --verify file.mkv
-
