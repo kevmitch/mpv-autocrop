@@ -25,7 +25,7 @@ Optional arguments
 ==================
 
     -h, --help            
-show this help message and exit
+show help message and exit
 
     --nshots NSHOTS, -n NSHOTS
 number of screenshots from which to estimate the crop parameters
