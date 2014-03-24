@@ -4,7 +4,6 @@ mp.set_property("pause","yes")
 
 namespace=string.gsub(mp.get_script_name(),'lua/','')
 opt_name=string.format("%s.out_file",namespace)
-mp.msg.info(opt_name)
 out_file=mp.get_opt(opt_name)
 
 if not out_file then
