@@ -33,7 +33,7 @@ Any arguments not recognized by the script are passed on to mpv
     
 You can get some diagnostic plotting with
 
-    $ mpv_autocrop.py -p file.mkv
+    $ mpv_autocrop.py --show-plot file.mkv
         
 And you can verify that mpv crops exactly as expected
 
