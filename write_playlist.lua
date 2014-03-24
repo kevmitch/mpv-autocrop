@@ -16,9 +16,7 @@ if not f then
    mp.msg.error(string.format("couldn't open %s",out_file))
 else
    playlist_count=mp.get_property("playlist-count")
-   mp.msg.info("playlist-count=",playlist_count)
    for i=1,playlist_count do
-      mp.msg.info(i)
       filename=mp.get_property(string.format("playlist/%d/filename",i-1))
       f:write(filename)
       f:write("\0")
