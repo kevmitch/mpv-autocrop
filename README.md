@@ -8,7 +8,7 @@ automatically computes the appropriate --vf=crop command for each one. These
 are then amalgamated with any unparsed arguments and used to finally execute
 mpv.
 
-Dependencies
+dependencies
 ============
 In order to run this program you need
 * python-numpy
@@ -17,7 +17,7 @@ In order to run this program you need
 * mpv with lua scripting enabled
 * python-matplotlib (for the --show-plot functionality)
 
-Examples
+examples
 ========
 To play a file with its dark borders cut out, simply run
 
