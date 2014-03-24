@@ -21,7 +21,8 @@ Usage
 =====
     usage: usage: mpv-autocrop.py [-h] [--nshots NSHOTS] [--tol TOL] [--pad PAD] [--show-plot] [--ignore-pixels IGNORE_PIXELS] [MPV_ARGS]
 
-optional arguments:
+Optional arguments
+==================
 
     -h, --help            
 show this help message and exit
