@@ -66,7 +66,8 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
               '--vo=null',
               '--ao=null',
               '--no-audio',
-              '--no-cache']
+              '--no-cache',
+              '--no-sub']
 
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
         stdout,stderr=p.communicate()
@@ -105,6 +106,7 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
               '--vf-add=dsize',
               '--ao=null',
               '--no-audio',
+              '--no-sub',
               '--lua=%s'%(mpv_lua_script),
               '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots),
               fname]
@@ -120,7 +122,7 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
             print stdout
             sys.exit(1)
         fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
-        print fpaths
+
         ims=imread(fpaths[0])
         shape=[nshots]+list(ims.shape)
         ims.resize(shape,refcheck=False)#add spaces for the other images
@@ -128,7 +130,7 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
             ims[i]=imread(fpaths[i])
     return ims
 
-def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt):
+def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=False):
     """
     do another round of screenshots with the crop command this time and verify
     that the correct region is cropped
@@ -148,9 +150,34 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt):
 
     ims_crop_test=get_screenshots(fname,nshots,mpv_args=['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)])
 
-    assert abs(ims_crop_test-ims_crop_ref).max()==0,'mpv didn\'t crop as expected'
+    res=abs(ims_crop_test-ims_crop_ref)
+    if res.max()!=0:
+        print 'ERROR: mpv didn\'t crop as expected'
+        for i,r in enumerate(res):
+            print i,'residual=',r.max()
+            if show_plot and r.max()>0:
+                try:
+                    import pylab as pl
+                except ImportError:
+                    print import_err_msg%("matplotlib","python-matplotlib")
+                    sys.exit(1)
+                    pl.ion()
 
-def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,verify=True):
+                fig=pl.figure(1,dpi=150)
+                fig.clf()
+                ax=fig.add_subplot(221)
+                ax.imshow(ims_crop_ref[i],cmap='gray',interpolation='nearest')
+                ax=fig.add_subplot(222)
+                ax.imshow(ims_crop_test[i],cmap='gray',interpolation='nearest')
+                ax=fig.add_subplot(223)
+                ax.imshow(res[i],cmap='gray',interpolation='nearest')
+                pl.draw()
+                print 'press enter to continue'
+                raw_input()
+        sys.exit(1)
+
+
+def get_crop_cmd(fname,nshots=11,tol=0.02,pad=0,ignore_pixels=0,show_plot=False,verify=True):
     """
     compute the appropriate crop command for a given file
     """
@@ -164,6 +191,7 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,
     # determine the cropping region where pixels average to greater than tol
     ygood=ymx>=tol
     xgood=xmx>=tol
+    print ymx[:10],tol
 
     if ygood.size>0:
         crop_top=np.flatnonzero(ygood[ignore_pixels:]      )[0]
@@ -206,7 +234,6 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,
     print 'crop_rgt=',crop_rgt
     if show_plot:
         """visually check the crop detection"""
-        from time import sleep
         try:
             import pylab as pl
         except ImportError:
@@ -254,7 +281,7 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,
         raw_input()
 
     if crop_top>0 or crop_bot>0 or crop_lft>0 or crop_rgt>0:
-        if verify: verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt)
+        if verify: verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=show_plot)
         return ['--hwdec=no','--vf=crop=%d:%d:%d:%d'%(w,h,x,y)]
     else:
         return []
@@ -274,7 +301,7 @@ if __name__ == "__main__":
     cmd=sys.argv[0]
     parser = argparse.ArgumentParser(description="This script uses mpv to search its arguments for valid playlist items and automatically computes the appropriate --vf=crop command for each one. These are then amalgamated with any unparsed arguments and used to finally execute mpv.")
     parser.add_argument('--nshots','-n',type=int,default=11,help="number of screenshots from which to estimate the crop parameters")
-    parser.add_argument('--tol','-t',type=float,default=0.05,help="the maximum brightness of pixels discarded by cropping (1.0 is full brightness)")
+    parser.add_argument('--tol','-t',type=float,default=0.1,help="the maximum brightness of pixels discarded by cropping (1.0 is full brightness)")
     parser.add_argument('--pad','-d',type=int,default=0,help="additional pixels to add to each side of the cropped image")
     parser.add_argument('--show-plot','-p',action='store_true',help="enable diagnostic plotting/visualisation (requires matplotlib)")
     parser.add_argument('--ignore-pixels','-i',type=int,default=0,help="number of pixels on the outter edge of the image to ignore")
