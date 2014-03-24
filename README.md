@@ -1,6 +1,6 @@
 mpv-autocrop
 ============
-autocropping scripts for mpv
+autocropping scripts for [mpv](https://github.com/mpv-player/mpv)
 
 
 This script uses mpv to search its arguments for valid playlist items and
@@ -17,27 +17,25 @@ In order to run this program you need
 * mpv with lua scripting enabled
 * python-matplotlib (for the --show-plot functionality)
 
-Usage
-=====
-    usage: usage: mpv-autocrop.py [-h] [--nshots NSHOTS] [--tol TOL] [--pad PAD] [--show-plot] [--ignore-pixels IGNORE_PIXELS] [MPV_ARGS]
+Examples
+========
+To play a file with its dark borders cut out, simply run
 
-Optional arguments
-==================
+    $ mpv_autocrop.py file.mkv 
+    
+Adjust the tolerance for what is considered "black" as a fraction between 0 (no luma) and 1 (max luma)
 
-    -h, --help
-show help message and exit
+    $ mpv_autocrop.py --tol 0.1 file.mkv
+    
+Any arguments not recognized by the script are passed on to mpv
 
-    --nshots NSHOTS, -n NSHOTS
-number of screenshots from which to estimate the crop parameters
+    $ mpv_autocrop.py file.mkv --start=10:00 --vo=opengl-hq
+    
+You can get some diagnostic plotting with
 
-    --tol TOL, -t TOL
-the maximum brightness of pixels discarded by cropping (1.0 is full brightness)
+    $ mpv_autocrop.py -p file.mkv
+        
+And you can verify that mpv crops exactly as expected
 
-    --pad PAD, -d PAD
-additional pixels to add to each side of the cropped image
+    $ mpv_autocrop.py --verify file.mkv
 
-    --show-plot, -p
-enable diagnostic plotting/visualisation (requires matplotlib)
-
-    --ignore-pixels IGNORE_PIXELS, -i IGNORE_PIXELS
-number of pixels on the outter edge of the image to ignore
