@@ -119,12 +119,12 @@ def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[])
             print 'STDOUT/STDERR was'
             print stdout
             sys.exit(1)
-
         fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
+        print fpaths
         ims=imread(fpaths[0])
         shape=[nshots]+list(ims.shape)
         ims.resize(shape,refcheck=False)#add spaces for the other images
-        for i in xrange(1,nshots):
+        for i in xrange(1,len(fpaths)):
             ims[i]=imread(fpaths[i])
     return ims
 
