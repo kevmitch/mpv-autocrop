@@ -255,7 +255,7 @@ def get_crop_cmd(fname,nshots=11,tol=0.02,pad=2,ignore_pixels=0,show_plot=False,
 
     if crop_top>0 or crop_bot>0 or crop_lft>0 or crop_rgt>0:
         if verify: verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt)
-        return ['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y),'--hwdec=no']
+        return ['--hwdec=no','--vf=crop=%d:%d:%d:%d'%(w,h,x,y)]
     else:
         return []
 
