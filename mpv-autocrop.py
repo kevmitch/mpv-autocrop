@@ -1,141 +1,16 @@
 #!/usr/bin/env python
-import os,sys,shutil,re,argparse
-from subprocess import Popen,PIPE,STDOUT
-from contextlib import contextmanager
-import_err_msg="""
-This script requires %s
-On Debian/Ubuntu:
-apt-get install %s
-"""
+import os,sys,argparse
+import mpv_utils
 try:
     import numpy as np
 except ImportError:
-    print import_err_msg%("numpy","python-numpy")
-    sys.exit(1)
-try:
-    from scipy.ndimage import imread
-except ImportError:
-    print import_err_msg%("scipy","python-scipy")
-    sys.exit(1)
-try:
-    import PIL
-except ImportError:
-    print import_err_msg%("python imaging library","python-imaging")
-    sys.exit(1)
-
-@contextmanager
-def tmp_dir():
-    """
-    safe temporary directory context manager
-    creates a temporary directory and returns it's path
-    to be used in a with statment
-    """
-    import tempfile
-    tmp_dir_path=tempfile.mkdtemp()
-    yield tmp_dir_path
-    #execute body of with statment
-    shutil.rmtree(tmp_dir_path)
-
-@contextmanager
-def tmp_file():
-    """
-    safe temporary file context manager
-    creates a temporary file and returns it's path
-    to be used in a with statment
-    """
-    import tempfile
-    tmp_fd,tmp_file_path=tempfile.mkstemp(text='true')
-    yield tmp_file_path
-    #execute body of with statment
-    os.close(tmp_fd)
-    os.remove(tmp_file_path)
-
-script_dir,this_file=os.path.split(__file__)
-default_playlist_script=os.path.join(script_dir,'write_playlist.lua')
-def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
-    """
-    invoke mpv with the write_playlist.lua script and return the playlist as a python list
-    """
-    for func in os.path.expanduser,os.path.abspath:
-        mpv_lua_script=func(mpv_lua_script)
-    mpv_lua_script_name,ext=os.path.splitext(os.path.basename(mpv_lua_script))
-    with tmp_file() as tmp_path:
-        cmd=['mpv']+mpv_args
-        cmd+=['--lua=%s'%mpv_lua_script,
-              '--lua-opts=%s.out_file=%s'%(mpv_lua_script_name,tmp_path),
-              '--vo=null',
-              '--ao=null',
-              '--no-audio',
-              '--no-cache',
-              '--no-sub']
-
-        p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
-        stdout,stderr=p.communicate()
-        rc=p.wait()
-        if rc!=0:
-            print 'mpv get playlist command exited with non-zero status'
-            print 'COMMAND WAS'
-            print cmd
-            print 'STDOUT/STDERR was'
-            print stdout
-            sys.exit(1)
-
-        with open(tmp_path,'r') as tmp_object:
-            playlist=tmp_object.read().strip('\0')
-            if len(playlist)==0:
-                playlist=[]
-            else:
-                playlist=playlist.split('\0')
-    return playlist
-
-default_scan_script=os.path.join(script_dir,'scan.lua')
-def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
-    """
-    invoke mpv with the scan.lua script and image vo and return a numpy array of screenshots
-    """
-    for func in os.path.expanduser,os.path.abspath:
-        mpv_lua_script=func(mpv_lua_script)
-    mpv_lua_script_name,ext=os.path.splitext(os.path.basename(mpv_lua_script))
-    with tmp_dir() as tmp_dir_path:
-        cmd=['mpv']+mpv_args
-        cmd+=['--no-config',
-              '--no-resume-playback',
-              '--no-cache',
-              '--hwdec=no',
-              '--vo=image:format=pgm:outdir=%s'%tmp_dir_path,
-              '--vf-add=dsize',
-              '--ao=null',
-              '--no-audio',
-              '--no-sub',
-              '--lua=%s'%(mpv_lua_script),
-              '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots),
-              fname]
-
-        p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
-        stdout,stderr=p.communicate()
-        rc=p.wait()
-        if rc!=0:
-            print 'mpv screenshot command exited with non-zero status'
-            print 'COMMAND WAS'
-            print cmd
-            print 'STDOUT/STDERR was'
-            print stdout
-            sys.exit(1)
-        fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
-
-        ims=imread(fpaths[0])
-        shape=[nshots]+list(ims.shape)
-        ims.resize(shape,refcheck=False)#add spaces for the other images
-        for i in xrange(1,len(fpaths)):
-            ims[i]=imread(fpaths[i])
-    return ims
+    mpv_utils.import_err_msg(module="numpy",package="python-numpy")
 
 def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=False):
     """
     do another round of screenshots with the crop command this time and verify
     that the correct region is cropped
     """
-
     ims_crop_ref=ims[:,crop_top:,crop_lft:]
     if crop_bot>0:
         ims_crop_ref=ims_crop_ref[:,:-crop_bot,:]
@@ -148,7 +23,7 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
     x=crop_lft
     y=crop_top
 
-    ims_crop_test=get_screenshots(fname,nshots,mpv_args=['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)])
+    ims_crop_test=mpv_utils.get_screenshots(fname,nshots,mpv_args=['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)])
 
     res=abs(ims_crop_test-ims_crop_ref)
     if res.max()!=0:
@@ -178,12 +53,11 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
     else:
         print 'crop_verified!'
 
-
 def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=False,verify=False):
     """
     compute the appropriate crop command for a given file
     """
-    ims=get_screenshots(fname,nshots)
+    ims=mpv_utils.get_screenshots(fname,nshots)
 
     nshots,Ny,Nx=ims.shape
     imax=float(np.iinfo(ims.dtype).max)
@@ -289,7 +163,7 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
 
 def main(mpv_args=[],**kwargs):
     # use mpv itself to figure out which arguments are playable items
-    playlist_files=get_playlist_files(mpv_args)
+    playlist_files=mpv_utils.get_playlist_files(mpv_args)
     assert len(playlist_files)>0,"need at least one playable, but file found none"
     # remove those from the args list
     mpv_args=[arg for arg in mpv_args if arg not in playlist_files]
