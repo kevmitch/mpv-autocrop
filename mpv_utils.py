@@ -92,27 +92,31 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
     return playlist
 
 default_scan_script=os.path.join(script_dir,'scan.lua')
-def sample_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
+def sample_screenshots(nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
     """
     invoke mpv with the scan.lua script and image vo and return a numpy array of screenshots
     """
     for func in os.path.expanduser,os.path.abspath:
         mpv_lua_script=func(mpv_lua_script)
     mpv_lua_script_name,ext=os.path.splitext(os.path.basename(mpv_lua_script))
+    # don't += here since keyword arguments are like static function variables,
+    # but the explicit assignment creates a new local instance
+    mpv_args=mpv_args+['--no-cache',
+                       '--lua=%s'%(mpv_lua_script),
+                       '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots)]
+    return dump_images(mpv_args=mpv_args)
+
+def dump_images(mpv_args=[]):
+    """
+    invoke mpv with the scan.lua script and image vo and return a numpy array of screenshots
+    """
     with tmp_dir() as tmp_dir_path:
         cmd=['mpv']+mpv_args
         cmd+=['--no-config',
               '--no-resume-playback',
-              '--no-cache',
-              '--hwdec=no',
-              '--vo=image:format=pgm:outdir=%s'%tmp_dir_path,
-              '--vf-add=dsize',
+              '--vo=image:outdir=%s'%tmp_dir_path,
               '--ao=null',
-              '--no-audio',
-              '--no-sub',
-              '--lua=%s'%(mpv_lua_script),
-              '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots),
-              fname]
+              '--no-audio']
         print ' '.join(cmd)
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
         stdout,stderr=p.communicate()
@@ -127,7 +131,7 @@ def sample_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=
         fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
 
         ims=imread(fpaths[0])
-        shape=[nshots]+list(ims.shape)
+        shape=[len(fpaths)]+list(ims.shape)
         ims.resize(shape,refcheck=False)#add spaces for the other images
         for i in xrange(1,len(fpaths)):
             ims[i]=imread(fpaths[i])

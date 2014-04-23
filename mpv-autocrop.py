@@ -57,7 +57,12 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
     """
     compute the appropriate crop command for a given file
     """
-    ims=mpv_utils.sample_screenshots(fname,nshots)
+
+    mpv_args=['--vo-defaults=image:format=pgm',
+              '--vf-add=dsize',
+              '--no-sub',
+              fname]
+    ims=mpv_utils.sample_screenshots(nshots,mpv_args=mpv_args)
 
     nshots,Ny,Nx=ims.shape
     imax=float(np.iinfo(ims.dtype).max)
