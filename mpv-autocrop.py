@@ -23,7 +23,7 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
     x=crop_lft
     y=crop_top
 
-    ims_crop_test=mpv_utils.get_screenshots(fname,nshots,mpv_args=['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)])
+    ims_crop_test=mpv_utils.sample_screenshots(fname,nshots,mpv_args=['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)])
 
     res=abs(ims_crop_test-ims_crop_ref)
     if res.max()!=0:
@@ -57,7 +57,7 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
     """
     compute the appropriate crop command for a given file
     """
-    ims=mpv_utils.get_screenshots(fname,nshots)
+    ims=mpv_utils.sample_screenshots(fname,nshots)
 
     nshots,Ny,Nx=ims.shape
     imax=float(np.iinfo(ims.dtype).max)

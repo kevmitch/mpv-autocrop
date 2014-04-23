@@ -92,7 +92,7 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
     return playlist
 
 default_scan_script=os.path.join(script_dir,'scan.lua')
-def get_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
+def sample_screenshots(fname,nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
     """
     invoke mpv with the scan.lua script and image vo and return a numpy array of screenshots
     """
