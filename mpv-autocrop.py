@@ -72,8 +72,7 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
     # determine the cropping region where pixels average to greater than thresh
     ygood=ymx>=thresh
     xgood=xmx>=thresh
-
-    if ygood.size>0:
+    if ygood.any():
         crop_top=np.flatnonzero(ygood[ignore_pixels:]      )[0]
         if crop_top>0: crop_top+=ignore_pixels
         crop_bot=np.flatnonzero(ygood[::-1][ignore_pixels:])[0]
@@ -82,7 +81,7 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
         print 'WARNING: Seems to be nothing here to crop from'
         crop_top=crop_bot=0
 
-    if xgood.size>0:
+    if xgood.any():
         crop_lft=np.flatnonzero(xgood[ignore_pixels:]     )[0]
         if crop_lft>0: crop_lft+=ignore_pixels
         crop_rgt=np.flatnonzero(xgood[::-1][ignore_pixels:])[0]
