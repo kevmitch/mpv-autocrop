@@ -23,7 +23,13 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
     x=crop_lft
     y=crop_top
 
-    ims_crop_test=mpv_utils.sample_screenshots(fname,nshots,mpv_args=['--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)])
+
+    mpv_args=['--vo-defaults=image:format=pgm',
+              '--vf-add=dsize',
+              '--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y),
+              '--no-sub',
+              fname]
+    ims_crop_test=mpv_utils.sample_screenshots(nshots,mpv_args=mpv_args)
 
     res=abs(ims_crop_test-ims_crop_ref)
     if res.max()!=0:
