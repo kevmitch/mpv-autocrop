@@ -96,8 +96,8 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
     mpv_lua_script_name,ext=os.path.splitext(os.path.basename(mpv_lua_script))
     with tmp_file() as tmp_path:
         cmd=['mpv']+mpv_args
-        cmd+=['--lua=%s'%mpv_lua_script,
-              '--lua-opts=%s.out_file=%s'%(mpv_lua_script_name,tmp_path),
+        cmd+=['--script=%s'%mpv_lua_script,
+              '--script-opts=%s.out_file=%s'%(mpv_lua_script_name,tmp_path),
               '--vo=null',
               '--ao=null',
               '--no-audio',
@@ -134,6 +134,6 @@ def sample_screenshots(nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
     # don't += here since keyword arguments are like static function variables,
     # but the explicit assignment creates a new local instance
     mpv_args=mpv_args+['--no-cache',
-                       '--lua=%s'%(mpv_lua_script),
-                       '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots)]
+                       '--script=%s'%(mpv_lua_script),
+                       '--script-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots)]
     return dump_images(mpv_args=mpv_args)
