@@ -54,6 +54,37 @@ def tmp_file():
     os.close(tmp_fd)
     os.remove(tmp_file_path)
 
+def dump_images(mpv_args=[]):
+    """
+    invoke mpv with image vo and return a numpy array of screenshots
+    """
+    with tmp_dir() as tmp_dir_path:
+        cmd=['mpv']+mpv_args
+        cmd+=['--no-config',
+              '--no-resume-playback',
+              '--vo=image:outdir=%s'%tmp_dir_path,
+              '--ao=null',
+              '--no-audio']
+        print ' '.join(cmd)
+        p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
+        stdout,stderr=p.communicate()
+        rc=p.wait()
+        if rc!=0:
+            print 'mpv screenshot command exited with non-zero status'
+            print 'COMMAND WAS'
+            print cmd
+            print 'STDOUT/STDERR was'
+            print stdout
+            sys.exit(1)
+        fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
+
+        ims=imread(fpaths[0])
+        shape=[len(fpaths)]+list(ims.shape)
+        ims.resize(shape,refcheck=False)#add spaces for the other images
+        for i in xrange(1,len(fpaths)):
+            ims[i]=imread(fpaths[i])
+    return ims
+
 script_dir,this_file=os.path.split(__file__)
 default_playlist_script=os.path.join(script_dir,'write_playlist.lua')
 def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
@@ -107,34 +138,3 @@ def sample_screenshots(nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
                        '--lua=%s'%(mpv_lua_script),
                        '--lua-opts=%s.num_frames=%d'%(mpv_lua_script_name,nshots)]
     return dump_images(mpv_args=mpv_args)
-
-def dump_images(mpv_args=[]):
-    """
-    invoke mpv with the scan.lua script and image vo and return a numpy array of screenshots
-    """
-    with tmp_dir() as tmp_dir_path:
-        cmd=['mpv']+mpv_args
-        cmd+=['--no-config',
-              '--no-resume-playback',
-              '--vo=image:outdir=%s'%tmp_dir_path,
-              '--ao=null',
-              '--no-audio']
-        print ' '.join(cmd)
-        p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
-        stdout,stderr=p.communicate()
-        rc=p.wait()
-        if rc!=0:
-            print 'mpv screenshot command exited with non-zero status'
-            print 'COMMAND WAS'
-            print cmd
-            print 'STDOUT/STDERR was'
-            print stdout
-            sys.exit(1)
-        fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
-
-        ims=imread(fpaths[0])
-        shape=[len(fpaths)]+list(ims.shape)
-        ims.resize(shape,refcheck=False)#add spaces for the other images
-        for i in xrange(1,len(fpaths)):
-            ims[i]=imread(fpaths[i])
-    return ims
