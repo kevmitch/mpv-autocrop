@@ -19,6 +19,7 @@ try:
     from scipy.ndimage import imread
 except ImportError:
     import_err_msg("scipy","python-scipy")
+# this is implicitly used by ndimage above
 try:
     import PIL
 except ImportError:
@@ -58,6 +59,7 @@ default_playlist_script=os.path.join(script_dir,'write_playlist.lua')
 def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
     """
     invoke mpv with the write_playlist.lua script and return the playlist as a python list
+    this is useful for distinguishing playlist items from command line arguments.
     """
     for func in os.path.expanduser,os.path.abspath:
         mpv_lua_script=func(mpv_lua_script)
@@ -94,7 +96,7 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
 default_scan_script=os.path.join(script_dir,'scan.lua')
 def sample_screenshots(nshots,mpv_lua_script=default_scan_script,mpv_args=[]):
     """
-    invoke mpv with the scan.lua script and image vo and return a numpy array of screenshots
+    call dump_images with the scan.lua script that samples the file at equally spaced intervals
     """
     for func in os.path.expanduser,os.path.abspath:
         mpv_lua_script=func(mpv_lua_script)
