@@ -69,8 +69,8 @@ def dump_images(mpv_args=[]):
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
         stdout,stderr=p.communicate()
         rc=p.wait()
-        if rc!=0:
-            print 'mpv screenshot command exited with non-zero status'
+        if rc not in (0,4):
+            print 'mpv screenshot command exited with code %d'%rc
             print 'COMMAND WAS'
             print cmd
             print 'STDOUT/STDERR was'
@@ -108,8 +108,8 @@ def get_playlist_files(mpv_args,mpv_lua_script=default_playlist_script):
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
         stdout,stderr=p.communicate()
         rc=p.wait()
-        if rc!=0:
-            print 'mpv get playlist command exited with non-zero status'
+        if rc not in (0,4):
+            print 'mpv get playlist command exited with code %d'%rc
             print 'COMMAND WAS'
             print cmd
             print 'STDOUT/STDERR was'
