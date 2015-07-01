@@ -65,7 +65,6 @@ def dump_images(mpv_args=[]):
               '--vo=image:outdir=%s'%tmp_dir_path,
               '--ao=null',
               '--no-audio']
-        print ' '.join(cmd)
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
         stdout,stderr=p.communicate()
         rc=p.wait()
