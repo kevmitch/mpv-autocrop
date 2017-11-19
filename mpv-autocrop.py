@@ -24,7 +24,7 @@ def verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=F
     y=crop_top
 
 
-    mpv_args=['--vo-defaults=image:format=pgm',
+    mpv_args=['--vo-image-format=png',
               '--vf-add=dsize',
               '--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y),
               '--no-sub',
@@ -64,7 +64,7 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
     compute the appropriate crop command for a given file
     """
 
-    mpv_args=['--vo-defaults=image:format=pgm',
+    mpv_args=['--vo-image-format=png',
               '--vf-add=dsize',
               '--no-sub',
               fname]
@@ -167,7 +167,7 @@ def get_crop_cmd(fname,nshots=11,thresh=0.02,pad=0,ignore_pixels=0,show_plot=Fal
 
     if crop_top>0 or crop_bot>0 or crop_lft>0 or crop_rgt>0:
         if verify: verify_crop(fname,nshots,ims,crop_top,crop_bot,crop_lft,crop_rgt,show_plot=show_plot)
-        return ['--hwdec=no','--vf=crop=%d:%d:%d:%d'%(w,h,x,y)]
+        return ['--hwdec=no','--vf-add=crop=%d:%d:%d:%d'%(w,h,x,y)]
     else:
         return []
 

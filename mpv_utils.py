@@ -62,7 +62,8 @@ def dump_images(mpv_args=[]):
         cmd=['mpv']+mpv_args
         cmd+=['--no-config',
               '--no-resume-playback',
-              '--vo=image:outdir=%s'%tmp_dir_path,
+              '--vo=image',
+              '--vo-image-outdir=%s'%tmp_dir_path,
               '--ao=null',
               '--no-audio']
         p=Popen(cmd,stdout=PIPE,stderr=STDOUT)
@@ -77,11 +78,12 @@ def dump_images(mpv_args=[]):
             sys.exit(1)
         fpaths=[os.path.join(tmp_dir_path,fname) for fname in os.listdir(tmp_dir_path)]
 
-        ims=imread(fpaths[0])
+        ims=imread(fpaths[0],mode='L')
         shape=[len(fpaths)]+list(ims.shape)
         ims.resize(shape,refcheck=False)#add spaces for the other images
         for i in xrange(1,len(fpaths)):
-            ims[i]=imread(fpaths[i])
+            ims[i]=imread(fpaths[i],mode='L')
+
     return ims
 
 script_dir,this_file=os.path.split(__file__)
