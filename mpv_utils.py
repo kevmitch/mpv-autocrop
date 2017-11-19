@@ -3,12 +3,14 @@ from subprocess import Popen,PIPE,STDOUT
 from contextlib import contextmanager
 import mpv_utils
 
+err_msg_fmt = """
+This script requires %s
+On Debian/Ubuntu: apt-get install %s
+"""
+
 def import_err_msg(module=None,package=None):
-    assert module and packge
-    print """ This script requires %s
-    On Debian/Ubuntu:
-    apt-get install %s
-    """%(module,package)
+    assert module and package
+    print err_msg_fmt%(module,package)
     sys.exit(1)
 
 try:
